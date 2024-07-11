@@ -1,7 +1,9 @@
 import './table.css';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DataGrid } from '@mui/x-data-grid';
+import { Dialog, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 
 const columns = [
   { field: 'ID', headerName: 'ID', width: 20, headerAlign: 'center', headerClassName: 'TableHeader' },
@@ -14,8 +16,19 @@ const columns = [
   { field: 'AssignedPerson', headerName: 'Assigned Person', width: 130, headerAlign: 'center', headerClassName: 'TableHeader'  },
 ]
 
-const Table = () => {
+
+const Table = ({handleRefresh}) => {
+  const[open, setOpen] = useState(false);
   const[data, setData] = useState([]);
+  const [formData, setFormData] = useState({
+    Incident: '',
+    StartDate: '',
+    Priority: '',
+    Status: '',
+    LastModifiedDate: '',
+    AssignedDate: '',
+    AssignedPerson: '',
+  });
 
   const fetch_data =()=> {
     axios.get("http://localhost/Tickets2/tickets/src/backend/connection.php").then(
@@ -41,6 +54,31 @@ const Table = () => {
   useEffect(() => {
     fetch_data();
   }, []);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    axios.post('http://localhost/Tickets2/tickets/src/backend/connection.php', formData)
+      .then(response => {
+        console.log(response.data);
+        handleClose();
+        handleRefresh();
+      })
+      .catch(error => {
+        console.error('There was an error adding the ticket!', error);
+      });
+  };
 
   return (
     <div className='Body'>
@@ -68,7 +106,89 @@ const Table = () => {
           </div>
       </div>
 
-      <button>Add Entry</button>
+      <button className='AddButton' onClick={handleClickOpen}>Add Entry</button>
+      <Dialog open={open} onClose={handleClose} >
+        <form>
+          <DialogContent>
+            <TextField label="Incident" 
+              name="Incident" 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange} 
+            />
+            <TextField label="Start Date" 
+              name="StartDate" 
+              type="date" 
+              InputLabelProps={{ shrink: true }} 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange} 
+            />
+            <TextField label="Priority" 
+              name="Priority" 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange}
+            />
+            <TextField label="Status" 
+              name="Status" 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange}
+            />
+            <TextField label="Last Modified Date" 
+              name="LastModifiedDate" 
+              type="date" 
+              InputLabelProps={{ shrink: true }} 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange} 
+            />
+            <TextField label="Assigned Date" 
+              name="AssignedDate" 
+              type="date" 
+              InputLabelProps={{ shrink: true }} 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange} 
+            />
+            <TextField label="Assigned Person" 
+              name="AssignedPerson" 
+              fullWidth 
+              margin="normal" 
+              required 
+              onChange={handleChange}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={handleClose} 
+              sx={{ 
+                backgroundColor: 'red', 
+                color: 'white', 
+                '&:hover': {color: 'red'}}
+            }>
+              Close
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              type="submit" 
+              sx={{ 
+                backgroundColor: 'green', 
+                color: "white", 
+                '&:hover': {color: 'green'} }
+              }>
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
     </div>
   );
