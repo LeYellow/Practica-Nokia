@@ -16,7 +16,7 @@
   border: 3px solid black;
   margin-top: 25px;
   margin-left: 25px;
-  width: 740px;
+  width: 900px;
 }
 
 p.Title{
@@ -48,12 +48,4 @@ button.AddButton{
 button:hover.AddButton{
   background-color:rgb(255, 170, 51);
   color: white;
-}
-
-.Submit{
-  color: green;
-}
-
-.Close{
-  color: red;
 }
