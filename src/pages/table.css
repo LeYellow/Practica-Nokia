@@ -1,7 +1,3 @@
-.TableHeader{
-  background-color: rgb(255, 170, 51);
-}
-
 .Body{
   background-color: rgb(36, 36, 36);
   width: 100%;
@@ -9,19 +5,38 @@
   position: absolute;
 }
 
-.Table {
-  background-color: rgba(255, 255, 255, 0.7);
+.Header{
+  background-color: #0066b2;
+  display: flex;
+  align-items: center;
   position: static;
-  border-radius: 10px;
-  border: 3px solid black;
-  margin-top: 25px;
-  margin-left: 25px;
-  width: 900px;
+  height: 50px;
 }
 
-p.Title{
-  background-color: rgb(255, 170, 51);
-  color: black;
+div.Header img{
+  margin-left: 30px;
+  width: auto;
+  height: 40px;
+}
+
+div.Header p{
+  flex: 1;
+  margin-left: 20px;
+  color: white;
+  font-size: 30px;
+  font-family: "Gill Sans", sans-serif;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+.TableHeader{
+  background-color: #0066b2;
+  color: white;
+}
+
+p.TableTitle{
+  background-color: #0066b2;
+  color: white;
   text-align: center;
   font-size: 30px;
   font-family: "Lucida Console", serif;
@@ -34,18 +49,27 @@ p.Title{
   border-top-right-radius: 10px;
 }
 
-button.AddButton{
+.Table {
+  background-color: rgba(255, 255, 255, 0.7);
+  position: static;
+  border-radius: 10px;
+  border: 3px solid black;
+  margin-top: 35px;
+  margin-left: 25px;
+  width: 1000px;
+}
+
+.AddButton{
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 8px;
-  border: 2px solid rgb(255, 170, 51);
-  margin-left: 25px;
-  margin-top: 20px;
+  border: 2px solid white;
+  margin-right: 30px;
   padding: 10px 24px;
   font-size: 14px;
   transition-duration: 0.3s;
 }
 
 button:hover.AddButton{
-  background-color:rgb(255, 170, 51);
+  background-color:#004a83;
   color: white;
 }
