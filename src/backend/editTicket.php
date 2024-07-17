@@ -15,20 +15,8 @@ $params = array(
     $ticketData['AssignedPerson'],
     $ticketData['ID'],
     );
-    /*
-    
-    $id=$ticketData['ID'];
-    $inc=$ticketData['Incident'];
-    $sd=$ticketData['StartDate'];
-    $p=$ticketData['Priority'];
-    $s=$ticketData['Status'];
-    $lmd=$ticketData['LastModifiedDate'];
-    $ad=$ticketData['AssignedDate'];
-    $ap=$ticketData['AssignedPerson'];
-    
-    */
+
 $sql = "UPDATE Tickets SET Incident = ?, StartDate = ?, Priority = ?, Status = ?, LastModifiedDate = ?, AssignedDate = ?, AssignedPerson = ? WHERE ID = ?";
-//$sql = "UPDATE Tickets SET Incident = $inc, StartDate = $sd, Priority = $p, Status = $s, LastModifiedDate = $lmd, AssignedDate = $ad, AssignedPerson = $ap WHERE ID = $id";
 
 $stmt = sqlsrv_query($conn, $sql, $params);
 if (!$stmt) {
