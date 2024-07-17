@@ -80,7 +80,7 @@ const Table = () => {
     fetch_data();
   }, []);
   
-//-----------Add Entry              ~dc baga si o intrare blank
+//-----------Add Entry
   const handleAddEntry = (event) => {
     event.preventDefault();
     axios.post('http://localhost/Tickets2/tickets/src/backend/addTicket.php', formData)
