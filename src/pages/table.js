@@ -1,9 +1,11 @@
 import './table.css';
+import StatusChart from '../components/statusChart.js';
+//import DeleteMenu from '../components/deleteMenu.js';
 import logo from './logo.jpg'; 
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Dialog, DialogContent, DialogActions, Button, TextField, DialogTitle, DialogContentText } from '@mui/material';
+import { Dialog, DialogContent, DialogActions, Button, TextField, DialogTitle, DialogContentText, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 const Table = () => {
   const[openAdd, setOpenAdd] = useState(false);
@@ -30,7 +32,7 @@ const Table = () => {
     AssignedDate: '',
     AssignedPerson: '',
   });
-  const columns = [
+  const columnsTicket = [
     { field: 'ID', headerName: 'ID', width: 20, headerAlign: 'center', headerClassName: 'TableHeader' },
     { field: 'Incident', headerName: 'Incident', width: 80, headerAlign: 'center', headerClassName: 'TableHeader'  },
     { field: 'StartDate', headerName: 'Start Date', width: 100, headerAlign: 'center', headerClassName: 'TableHeader'  },
@@ -55,29 +57,29 @@ const Table = () => {
   ]
 
 //-----------Fetch Data
-  const fetch_data =()=> {
-    axios.get("http://localhost/Tickets2/tickets/src/backend/getTickets.php").then(
+  const fetchTickets = async ()=> {
+    await axios.get("http://localhost/Tickets2/tickets/src/backend/getTickets.php").then(
       (response) => {
         console.log(response);
         if(Array.isArray(response.data)){
           if(response.data.length>0 && typeof response.data[0] === 'object'){
             setData(response.data);
           } else {
-            console.error('Received data is not an array of objects:', response.data);
+            console.error('Ticket List: Received data is not an array of objects:', response.data);
           }
         }
         else
         {
-          console.error('expected array but received: ', response.data);
+          console.error('Ticket List: expected array but received: ', response.data);
         }
       }
     ).catch(error => {
-      console.error('err fetching data:', error);
+      console.error('Error fetching Ticket data:', error);
     });
   }
   
   useEffect(() => {
-    fetch_data();
+    fetchTickets();
   }, []);
   
 //-----------Add Entry
@@ -87,7 +89,7 @@ const Table = () => {
       .then(response => {
         console.log(response.data);
         handleClose();
-        fetch_data();
+        fetchTickets();
       })
       .catch(error => {
         console.error('There was an error adding the ticket!', error);
@@ -114,7 +116,7 @@ const Table = () => {
     .then(response => {
       console.log(response.data);
       handleClose();
-      fetch_data();
+      fetchTickets();
     })
     .catch(error => {
       console.error('There was an error deleting the ticket!', error);
@@ -133,7 +135,7 @@ const Table = () => {
     .then(response => {
         console.log(response.data);
         handleClose();
-        fetch_data();
+        fetchTickets();
     })
     .catch(error => {
       console.error('There was an error editing the ticket!', error);
@@ -157,12 +159,12 @@ const Table = () => {
         <button className='AddButton' onClick={handleClickOpen}>Add Ticket</button>
       </div>
 
-      <div className="Table">
+      <div className="TableTickets">
         <p className='TableTitle'> Tickets List </p>
           <div style={{ height: 370 }}>
             <DataGrid
               rows={data}
-              columns={columns}
+              columns={columnsTicket}
               getRowId={(row) => row.ID}
               initialState={{
                 pagination: {
@@ -181,15 +183,31 @@ const Table = () => {
           </div>
       </div>
 
+      <StatusChart/>
+
       <Dialog open={openAdd} onClose={handleClose} >
         <form>
           <DialogTitle> Add ticket </DialogTitle>
           <DialogContent>
             <TextField label="Incident" name="Incident" fullWidth margin="normal" required onChange={handleChange}/>
             <TextField label="Start Date" name="StartDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
-            <TextField label="Priority" name="Priority" fullWidth margin="normal" required onChange={handleChange}/>
-            <DialogContentText sx={{fontSize: 12}}>1-critical, 2-high, 3-medium, 4-low</DialogContentText>
-            <TextField label="Status" name="Status" fullWidth margin="normal" required onChange={handleChange}/>
+            <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
+              <InputLabel id="priorityLabel">Priority</InputLabel>
+              <Select labelId="priorityLabel" id="priority" value={formData.Priority} label="Priority" name="Priority" onChange={handleChange}>
+                <MenuItem value={1}>Critical</MenuItem>
+                <MenuItem value={2}>High</MenuItem>
+                <MenuItem value={3}>Medium</MenuItem>
+                <MenuItem value={4}>Low</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
+              <InputLabel id="statusLabel">Status</InputLabel>
+              <Select labelId="statusLabel" id="status" value={formData.Status} label="Status" name="Status" onChange={handleChange}>
+                <MenuItem value={"Open"}>Open</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
+                <MenuItem value={"Closed"}>Closed</MenuItem>
+              </Select>
+            </FormControl>
             <TextField label="Last Modified Date" name="LastModifiedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
             <TextField label="Assigned Date" name="AssignedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
             <TextField label="Assigned Person" name="AssignedPerson" fullWidth margin="normal" required onChange={handleChange}/>
@@ -222,7 +240,14 @@ const Table = () => {
             <TextField label="Start Date" name="StartDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.StartDate} onChange={handleEditChange}/>
             <TextField label="Priority" name="Priority" fullWidth margin="normal" required value={editData.Priority} onChange={handleEditChange}/>
             <DialogContentText sx={{fontSize: 12}}>1-critical, 2-high, 3-medium, 4-low</DialogContentText>
-            <TextField label="Status" name="Status" fullWidth margin="normal" required value={editData.Status} onChange={handleEditChange}/>
+            <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
+              <InputLabel id="statusLabel">Status</InputLabel>
+              <Select labelId="statusLabel" id="status" value={editData.Status} label="Status" name="Status" onChange={handleEditChange}>
+                <MenuItem value={"Open"}>Open</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
+                <MenuItem value={"Closed"}>Closed</MenuItem>
+              </Select>
+            </FormControl>
             <TextField label="Last Modified Date" name="LastModifiedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.LastModifiedDate} onChange={handleEditChange}/>
             <TextField label="Assigned Date" name="AssignedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.AssignedDate} onChange={handleEditChange}/>
             <TextField label="Assigned Person" name="AssignedPerson" fullWidth margin="normal" required value={editData.AssignedPerson} onChange={handleEditChange}/>
@@ -239,3 +264,15 @@ const Table = () => {
 
 
 export default Table;
+
+/*
+<FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
+              <InputLabel id="priorityLabel">Priority</InputLabel>
+              <Select labelId="priorityLabel" id="priority" value={editData.Priority} label="Priority" name="Priority" onChange={handleChange}>
+                <MenuItem value={1}>Critical</MenuItem>
+                <MenuItem value={2}>High</MenuItem>
+                <MenuItem value={3}>Medium</MenuItem>
+                <MenuItem value={4}>Low</MenuItem>
+              </Select>
+            </FormControl>
+*/
