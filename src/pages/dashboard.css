@@ -73,3 +73,8 @@ button:hover.AddButton{
   background-color:#004a83;
   color: white;
 }
+
+.Charts{
+  display: flex;
+  flex-direction: row;
+}

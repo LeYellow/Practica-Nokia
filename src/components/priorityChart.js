@@ -1,15 +1,15 @@
-import './statusChart.css';
+import './priorityChart.css';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Chart from 'react-apexcharts';
 import { DataGrid } from '@mui/x-data-grid';
 import { Dialog, DialogContent, DialogActions, Button, DialogTitle } from '@mui/material';
 
-const StatusChart = () => {
+const PriorityChart = () => {
   const[dataChart, setDataChart] = useState([]);
   const[dataFiltered, setDataFiltered] = useState([]);
   const[openDialog, setOpenDialog] = useState(false);
-  const[selectedStatus, setSelectedStatus] = useState('');
+  const[selectedPriority, setSelectedPriority] = useState('');
   const filterColumns = [
     { field: 'ID', headerName: 'ID', width: 20, headerAlign: 'center', headerClassName: 'TableHeader' },
     { field: 'Incident', headerName: 'Incident', width: 80, headerAlign: 'center', headerClassName: 'TableHeader'  },
@@ -22,27 +22,28 @@ const StatusChart = () => {
     { field: 'AssignedPerson', headerName: 'Assigned Person', width: 130, headerAlign: 'center', headerClassName: 'TableHeader'  },
   ]
 
-  const fetchStatus = async ()=> {
+  const fetchPriority = async ()=> {
     try {
-      const response = await axios.get("http://localhost/Tickets2/tickets/src/backend/getStatusCounter.php")
+      const response = await axios.get("http://localhost/Tickets2/tickets/src/backend/getPriorityCounter.php")
       //console.log(response);    //debug
       if(Array.isArray(response.data)){
         if(response.data.length>0 && typeof response.data[0] === 'object'){
           setDataChart(response.data);
         } else {
-          console.error('Status Chart: Received data is not an array of objects:', response.data);
+          console.error('Priority Chart: Received data is not an array of objects:', response.data);
         }
       } else {
-        console.error('Status Chart: expected array but received: ', response.data);
+        console.error('Priority Chart: expected array but received: ', response.data);
       }
     } catch (error) {
-      console.error('Status Chart: Error fetching Ticket data:', error);
+      console.error('Priority Chart: Error fetching Ticket data:', error);
     }
   }
 
-  const fetchTicketsByStatus = async (status)=> {
+  const fetchTicketsByPriority = async (priority)=> {
     try {
-      const response = await axios.get(`http://localhost/Tickets2/tickets/src/backend/getTicketsByStatus.php?status=${status}`)
+      const response = await axios.get(`http://localhost/Tickets2/tickets/src/backend/getTicketsByPriority.php?priority=${priority}`)
+      console.log(priority);
       //console.log(response);    //debug
       if(Array.isArray(response.data)){
         if(response.data.length>0 && typeof response.data[0] === 'object'){
@@ -59,14 +60,14 @@ const StatusChart = () => {
   }
 
   useEffect(() => {
-    fetchStatus();
+    fetchPriority();
   }, []);
 
-  const handleSegmentClick = (status) => {
-    setSelectedStatus(status);
-    fetchTicketsByStatus(status);
+  const handleSegmentClick = (priority) => {
+    setSelectedPriority(priority);
+    fetchTicketsByPriority(priority);
     setOpenDialog(true);
-    console.log(status)
+    console.log(priority)
   };
 
   const handleClose = () => {
@@ -74,15 +75,15 @@ const StatusChart = () => {
   }
 
   const chartData = {
-    series: dataChart.map(stat => stat.TicketCount),
+    series: dataChart.map(item => item.TicketCount),
     options: {
       chart: {
-        type: 'pie',
+
+        type: 'polarArea',
         events: {
           dataPointSelection: (event, chartContext, opts) => {
-            const status = chartData.options.labels[opts.dataPointIndex];
-            handleSegmentClick(status);
-            
+            const priority = chartData.options.labels[opts.dataPointIndex];
+            handleSegmentClick(priority);
           }
         }
       },
@@ -93,13 +94,13 @@ const StatusChart = () => {
           }
         }
       },
-      labels: dataChart.map(stat => stat.Status),
+      labels: dataChart.map(item => item.Priority),
+      fill: {
+        opacity: 0.8
+      },
       responsive: [{
         breakpoint: 480,
         options: {
-          chart: {
-            width: 200
-          },
           legend: {
             position: 'bottom'
           }
@@ -109,16 +110,16 @@ const StatusChart = () => {
   };
 
   return (
-    <div className="StatusChart">
+    <div className="PriorityChart">
       <Chart 
         options={chartData.options} 
         series={chartData.series} 
-        type="pie"
-      />
+        type="polarArea"
+        />
 
       <Dialog open={openDialog} onClose={handleClose} maxWidth='lg'>
         <form>
-          <DialogTitle> {selectedStatus} Tickets </DialogTitle>
+          <DialogTitle> {selectedPriority} Tickets </DialogTitle>
             <DialogContent>
               {dataFiltered.length > 0 ? (
                 <div className="Table">
@@ -135,7 +136,7 @@ const StatusChart = () => {
                   />
                 </div>
               ) : (
-                <p>No tickets found for this status.</p>
+                <p>No tickets found for this priority.</p>
               )}
             </DialogContent>
           <DialogActions>
@@ -148,4 +149,4 @@ const StatusChart = () => {
 }
 
 
-export default StatusChart;
+export default PriorityChart;

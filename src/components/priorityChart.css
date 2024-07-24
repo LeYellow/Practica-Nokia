@@ -1,0 +1,16 @@
+.PriorityChart {
+    background-color: rgba(255, 255, 255, 0.7);
+    position: static;
+    border-radius: 10px;
+    border: 3px solid black;
+    margin-top: 35px;
+    margin-left: 25px;
+    height: 350px;
+    width: 485px;
+
+}
+
+.Table {
+    height: 371px;
+    width: 842px;
+}

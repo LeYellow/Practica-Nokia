@@ -1,15 +1,15 @@
 import './App.css';
-import Table from './pages/table';
+import Dashboard from './pages/dashboard';
 import { useState } from 'react';
 
 function App() {
   const [view, setView] = useState('HOME');
  
-  document.title = 'Tickets Table';
+  document.title = 'Ticket Dashboard';
   return (
     <div>
       {view === 'HOME' ?
-        <Table setView={setView}/>
+        <Dashboard setView={setView}/>
       :null}
     </div>
   );

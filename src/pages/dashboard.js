@@ -1,17 +1,18 @@
-import './table.css';
+import './dashboard.css';
 import StatusChart from '../components/statusChart.js';
-//import DeleteMenu from '../components/deleteMenu.js';
+import PriorityChart from '../components/priorityChart.js';
 import logo from './logo.jpg'; 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Dialog, DialogContent, DialogActions, Button, TextField, DialogTitle, DialogContentText, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
-const Table = () => {
-  const[openAdd, setOpenAdd] = useState(false);
+const Dashboard = () => {
+  const[openMenu, setOpenMenu] = useState(false);
   const[openDelete, setOpenDelete] = useState(false);
+  const[priorityMap, setPriorityMap] = useState({});
   const[selectedIncident, setSelectedIncident] = useState(null);
-  const[openEdit, setOpenEdit] = useState(false);
+  const[isEditMode, setIsEditMode] = useState(false);
   const[editData, setEditData] = useState({
     ID: '',
     Incident: '',
@@ -57,37 +58,46 @@ const Table = () => {
   ]
 
 //-----------Fetch Data
-  const fetchTickets = async ()=> {
-    await axios.get("http://localhost/Tickets2/tickets/src/backend/getTickets.php").then(
-      (response) => {
-        console.log(response);
-        if(Array.isArray(response.data)){
-          if(response.data.length>0 && typeof response.data[0] === 'object'){
-            setData(response.data);
-          } else {
-            console.error('Ticket List: Received data is not an array of objects:', response.data);
-          }
+  const fetchTickets = async () => {
+    try {
+      const response = await axios.get("http://localhost/Tickets2/tickets/src/backend/getTickets.php")
+      //console.log(response);    //debug
+      if(Array.isArray(response.data)){
+        if(response.data.length>0 && typeof response.data[0] === 'object'){
+          setData(response.data);
+        } else {
+          console.error('Ticket List: Received data is not an array of objects:', response.data);
         }
-        else
-        {
-          console.error('Ticket List: expected array but received: ', response.data);
-        }
+      } else {
+        console.error('Ticket List: expected array but received: ', response.data);
       }
-    ).catch(error => {
+    } catch (error) {
       console.error('Error fetching Ticket data:', error);
-    });
+    }
   }
   
+  const mapPriorities = async () => {
+    const response = await axios.get("http://localhost/Tickets2/tickets/src/backend/getPriorities.php")
+    const priorityData = response.data;
+    const priorityMap = {};
+    priorityData.forEach(element => {
+      priorityMap[element.ID] = element.Priority;
+    });
+    setPriorityMap(priorityMap);
+    //console.log(priorityMap);   //debug
+  }
+
   useEffect(() => {
     fetchTickets();
+    mapPriorities();
   }, []);
   
 //-----------Add Entry
-  const handleAddEntry = (event) => {
+  const handleAddEntry = async (event) => {
     event.preventDefault();
-    axios.post('http://localhost/Tickets2/tickets/src/backend/addTicket.php', formData)
+    await axios.post('http://localhost/Tickets2/tickets/src/backend/addTicket.php', formData)
       .then(response => {
-        console.log(response.data);
+        //console.log(response.data);   //debug
         handleClose();
         fetchTickets();
       })
@@ -96,8 +106,9 @@ const Table = () => {
       });
   };
 
-  const handleClickOpen = () => {
-    setOpenAdd(true);
+  const handleAddClick = () => {
+    setIsEditMode(false);
+    setOpenMenu(true);
   };
   
   const handleChange = (e) => {
@@ -105,16 +116,15 @@ const Table = () => {
   };
   
   const handleClose = () => {
-    setOpenAdd(false);
+    setOpenMenu(false);
     setOpenDelete(false);
-    setOpenEdit(false);
   };
   
 //-----------Delete Entry             ~nush dc da refresh la toata pagina
-  const handleDeleteEntry = () => {
-    axios.delete(`http://localhost/Tickets2/tickets/src/backend/deleteTicket.php?incident=${selectedIncident}`)
+  const handleDeleteEntry = async () => {
+    await axios.delete(`http://localhost/Tickets2/tickets/src/backend/deleteTicket.php?incident=${selectedIncident}`)
     .then(response => {
-      console.log(response.data);
+      //console.log(response.data);     //debug
       handleClose();
       fetchTickets();
     })
@@ -129,11 +139,11 @@ const Table = () => {
   };
 
 //-----------Edit Entry
-  const handleEditEntry = (event) => {
+  const handleEditEntry = async (event) => {
     event.preventDefault();
-    axios.put(`http://localhost/Tickets2/tickets/src/backend/editTicket.php`, editData)
+    await axios.put(`http://localhost/Tickets2/tickets/src/backend/editTicket.php`, editData)
     .then(response => {
-        console.log(response.data);
+        //console.log(response.data);     //debug
         handleClose();
         fetchTickets();
     })
@@ -143,8 +153,9 @@ const Table = () => {
   }
 
   const handleEditClick = (row) => {
+    setIsEditMode(true);
     setEditData(row);
-    setOpenEdit(true);
+    setOpenMenu(true);
   };
 
   const handleEditChange = (e) => {
@@ -156,7 +167,7 @@ const Table = () => {
       <div className='Header'>
         <img src={logo} alt="Nokia"/>
         <p>Ticket Dashboard</p>
-        <button className='AddButton' onClick={handleClickOpen}>Add Ticket</button>
+        <button className='AddButton' onClick={handleAddClick}>Add Ticket</button>
       </div>
 
       <div className="TableTickets">
@@ -183,38 +194,40 @@ const Table = () => {
           </div>
       </div>
 
-      <StatusChart/>
+      <div className='Charts'>
+        <StatusChart/>
+        <PriorityChart/>
+      </div>
 
-      <Dialog open={openAdd} onClose={handleClose} >
+      <Dialog open={openMenu} onClose={handleClose} >
         <form>
-          <DialogTitle> Add ticket </DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Ticket' : 'Add New Ticket'}</DialogTitle>
           <DialogContent>
-            <TextField label="Incident" name="Incident" fullWidth margin="normal" required onChange={handleChange}/>
-            <TextField label="Start Date" name="StartDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
+            <TextField label="Incident" name="Incident" fullWidth margin="normal" required onChange={isEditMode ? handleEditChange : handleChange} value={isEditMode ? editData.Incident : formData.Incident} disabled={isEditMode}/>
+            <TextField label="Start Date" name="StartDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={isEditMode ? handleEditChange : handleChange}  value={isEditMode ? editData.StartDate : formData.StartDate}/>
             <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
               <InputLabel id="priorityLabel">Priority</InputLabel>
-              <Select labelId="priorityLabel" id="priority" value={formData.Priority} label="Priority" name="Priority" onChange={handleChange}>
-                <MenuItem value={1}>Critical</MenuItem>
-                <MenuItem value={2}>High</MenuItem>
-                <MenuItem value={3}>Medium</MenuItem>
-                <MenuItem value={4}>Low</MenuItem>
+              <Select labelId="priorityLabel" id="priority" label="Priority" name="Priority" onChange={isEditMode ? handleEditChange : handleChange} value={isEditMode ? editData.Priority : formData.Priority}>
+                {Object.entries(priorityMap).map(([value, label]) => (
+                  <MenuItem key={value} value={Number(value)}>{label}</MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
               <InputLabel id="statusLabel">Status</InputLabel>
-              <Select labelId="statusLabel" id="status" value={formData.Status} label="Status" name="Status" onChange={handleChange}>
+              <Select labelId="statusLabel" id="status" value={isEditMode ? editData.Status : formData.Status} label="Status" name="Status" onChange={isEditMode ? handleEditChange : handleChange}>
                 <MenuItem value={"Open"}>Open</MenuItem>
                 <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Closed"}>Closed</MenuItem>
               </Select>
             </FormControl>
-            <TextField label="Last Modified Date" name="LastModifiedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
-            <TextField label="Assigned Date" name="AssignedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={handleChange}/>
-            <TextField label="Assigned Person" name="AssignedPerson" fullWidth margin="normal" required onChange={handleChange}/>
+            <TextField label="Last Modified Date" name="LastModifiedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={isEditMode ? handleEditChange : handleChange} value={isEditMode ? editData.LastModifiedDate : formData.LastModifiedDate}/>
+            <TextField label="Assigned Date" name="AssignedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required onChange={isEditMode ? handleEditChange : handleChange} value={isEditMode ? editData.AssignedDate : formData.AssignedDate}/>
+            <TextField label="Assigned Person" name="AssignedPerson" fullWidth margin="normal" required onChange={isEditMode ? handleEditChange : handleChange} value={isEditMode ? editData.AssignedPerson : formData.AssignedPerson}/>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} sx={{backgroundColor: 'red', color: 'white', '&:hover': {backgroundColor: 'darkred'}}}>Close</Button>
-            <Button onClick={handleAddEntry} type="submit" sx={{ backgroundColor: 'green', color: "white", '&:hover': {backgroundColor: 'darkgreen'}}}>Submit</Button>
+            <Button onClick={isEditMode ? handleEditEntry : handleAddEntry} type="submit" sx={{ backgroundColor: 'green', color: "white", '&:hover': {backgroundColor: 'darkgreen'}}}>{isEditMode ? 'Edit' : 'Submit'}</Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -231,48 +244,9 @@ const Table = () => {
           </DialogActions>
         </form>
       </Dialog>
-
-      <Dialog open={openEdit} onClose={handleClose} >
-        <form>
-          <DialogTitle> Edit ticket </DialogTitle>
-          <DialogContent>
-            <TextField label="Incident" name="Incident" fullWidth margin="normal" value={editData.Incident} disabled/>
-            <TextField label="Start Date" name="StartDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.StartDate} onChange={handleEditChange}/>
-            <TextField label="Priority" name="Priority" fullWidth margin="normal" required value={editData.Priority} onChange={handleEditChange}/>
-            <DialogContentText sx={{fontSize: 12}}>1-critical, 2-high, 3-medium, 4-low</DialogContentText>
-            <FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
-              <InputLabel id="statusLabel">Status</InputLabel>
-              <Select labelId="statusLabel" id="status" value={editData.Status} label="Status" name="Status" onChange={handleEditChange}>
-                <MenuItem value={"Open"}>Open</MenuItem>
-                <MenuItem value={"In Progress"}>In Progress</MenuItem>
-                <MenuItem value={"Closed"}>Closed</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField label="Last Modified Date" name="LastModifiedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.LastModifiedDate} onChange={handleEditChange}/>
-            <TextField label="Assigned Date" name="AssignedDate" type="date" InputLabelProps={{ shrink: true }} fullWidth margin="normal" required value={editData.AssignedDate} onChange={handleEditChange}/>
-            <TextField label="Assigned Person" name="AssignedPerson" fullWidth margin="normal" required value={editData.AssignedPerson} onChange={handleEditChange}/>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} sx={{backgroundColor: 'red', color: 'white', '&:hover': {backgroundColor: 'darkred'}}}>Close</Button>
-            <Button onClick={handleEditEntry} type="submit" sx={{ backgroundColor: 'green', color: "white", '&:hover': {backgroundColor: 'darkgreen'}}}>Edit</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
     </div>
   );
 }
 
 
-export default Table;
-
-/*
-<FormControl fullWidth required sx={{marginTop: '15px', marginBottom: '10px'}}>
-              <InputLabel id="priorityLabel">Priority</InputLabel>
-              <Select labelId="priorityLabel" id="priority" value={editData.Priority} label="Priority" name="Priority" onChange={handleChange}>
-                <MenuItem value={1}>Critical</MenuItem>
-                <MenuItem value={2}>High</MenuItem>
-                <MenuItem value={3}>Medium</MenuItem>
-                <MenuItem value={4}>Low</MenuItem>
-              </Select>
-            </FormControl>
-*/
+export default Dashboard;
