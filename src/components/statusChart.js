@@ -76,6 +76,7 @@ const StatusChart = () => {
   const chartData = {
     series: dataChart.map(stat => stat.TicketCount),
     options: {
+      colors: ['#4CBB17', '#FFD700', '#EF0107'],
       chart: {
         type: 'pie',
         events: {

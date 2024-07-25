@@ -77,8 +77,8 @@ const PriorityChart = () => {
   const chartData = {
     series: dataChart.map(item => item.TicketCount),
     options: {
+      colors: ['#EF0107', '#FFD700', '#4CBB17', '#007FFF'],
       chart: {
-
         type: 'polarArea',
         events: {
           dataPointSelection: (event, chartContext, opts) => {
