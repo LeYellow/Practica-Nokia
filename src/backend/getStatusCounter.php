@@ -2,7 +2,10 @@
 
 require 'config.php';
 
-$sql = "SELECT TicketCountsByStatus.Status, TicketCountsByStatus.TicketCount FROM TicketCountsByStatus";
+$sql = "SELECT Tickets.Status, COUNT(*) as TicketCount
+FROM Tickets
+GROUP BY Status
+order by Status DESC";
 
 $stmt=sqlsrv_query($conn, $sql);
 if (!$stmt) {

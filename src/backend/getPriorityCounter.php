@@ -2,7 +2,19 @@
 
 require 'config.php';
 
-$sql = "SELECT TicketCountsByPriority.Priority, TicketCountsByPriority.TicketCount FROM TicketCountsByPriority";
+$sql = "SELECT *, COUNT(*) AS TicketCount
+FROM (
+SELECT Decode.Priority
+FROM Tickets
+LEFT JOIN Decode on Tickets.Priority = Decode.ID
+) AS C
+GROUP BY Priority
+ORDER BY case when Priority = 'Critical' then 1
+              when Priority = 'High' then 2
+              when Priority = 'Medium' then 3
+              when Priority = 'Low' then 4
+              else 5
+         end asc";
 
 $stmt=sqlsrv_query($conn, $sql);
 if (!$stmt) {
