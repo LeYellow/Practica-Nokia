@@ -4,11 +4,11 @@ import PriorityChart from '../components/priorityChart.js';
 import logo from '../resources/logo.svg'; 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { CSVLink } from "react-csv";
 import { DataGrid } from '@mui/x-data-grid';
 import { Dialog, DialogContent, DialogActions, Button, TextField, DialogTitle, DialogContentText, MenuItem, Select, InputLabel, FormControl, Tooltip } from '@mui/material';
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
-import { CSVLink } from "react-csv";
 
 const Dashboard = () => {
   const[openMenu, setOpenMenu] = useState(false);
@@ -39,6 +39,13 @@ const Dashboard = () => {
     LastModifiedDate: '',
     AssignedDate: '',
     AssignedPerson: '',
+    Description: '',
+    Requestor: '',
+    Team: '',
+    ProjectName: '',
+  });
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [notes, setNotes] = useState({
     Description: '',
     Requestor: '',
     Team: '',
@@ -91,6 +98,29 @@ const Dashboard = () => {
     }
   }
   
+  const fetchTicketNotes = async (incident) => {
+    try {
+      const response = await axios.get(`http://localhost/Tickets2/tickets/src/backend/getDescription.php?incident=${incident}`);
+      //console.log(response);    //debug
+      if(Array.isArray(response.data)){
+        if(response.data.length>0 && typeof response.data[0] === 'object'){
+          setNotes(response.data[0]);
+        } else {
+          setNotes({
+            Description: 'No description available.',
+            Requestor: 'N/A',
+            Team: 'N/A',
+            ProjectName: 'N/A'
+          });
+        }
+      } else {
+        console.error('Ticket Description: expected array but received: ', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching Ticket data:', error);
+    }
+  };
+
   const mapPriorities = async () => {
     const response = await axios.get("http://localhost/Tickets2/tickets/src/backend/getPriorities.php")
     const priorityData = response.data;
@@ -196,37 +226,6 @@ const Dashboard = () => {
   };
 
 //-----------Ticket Description
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [notes, setNotes] = useState({
-    Description: '',
-    Requestor: '',
-    Team: '',
-    ProjectName: '',
-  });
-
-  const fetchTicketNotes = async (incident) => {
-    try {
-      const response = await axios.get(`http://localhost/Tickets2/tickets/src/backend/getDescription.php?incident=${incident}`);
-      //console.log(response);    //debug
-      if(Array.isArray(response.data)){
-        if(response.data.length>0 && typeof response.data[0] === 'object'){
-          setNotes(response.data[0]);
-        } else {
-          setNotes({
-            Description: 'No description available.',
-            Requestor: 'N/A',
-            Team: 'N/A',
-            ProjectName: 'N/A'
-          });
-        }
-      } else {
-        console.error('Ticket Description: expected array but received: ', response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching Ticket data:', error);
-    }
-  };
-
   const handleRowClick = (params) => {
     setSelectedRow(params.row);
     fetchTicketNotes(params.row.Incident);
