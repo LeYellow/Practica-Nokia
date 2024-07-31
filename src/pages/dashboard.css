@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'NokiaKokia';
+  src: url('../resources/NokiaKokia.ttf')  format('truetype');
+}
+
 .Body{
   background-color: rgb(36, 36, 36);
   min-width: 100%;
@@ -6,7 +11,7 @@
 }
 
 .Header{
-  background-color: #0066b2;
+  background-color: white;
   display: flex;
   align-items: center;
   position: static;
@@ -16,26 +21,26 @@
 div.Header img{
   margin-left: 30px;
   width: auto;
-  height: 40px;
+  height: 35px;
 }
 
 div.Header p{
   flex: 1;
   margin-left: 20px;
-  color: white;
-  font-size: 30px;
-  font-family: "Gill Sans", sans-serif;
+  color: #124191;
+  font-size: 40px;
+  font-family: "NokiaKokia", "Gill Sans", sans-serif;
   font-weight: bold;
   font-variant: small-caps;
 }
 
 .TableHeader{
-  background-color: #0066b2;
+  background-color: #124191;
   color: white;
 }
 
 p.TableTitle{
-  background-color: #0066b2;
+  background-color: #124191;
   color: white;
   text-align: center;
   font-size: 30px;
@@ -56,25 +61,76 @@ p.TableTitle{
   border: 3px solid black;
   margin-top: 35px;
   margin-left: 25px;
-  width: 1000px;
+  width: 940px;
+}
+
+.TicketDescription{
+  background-color: rgba(255, 255, 255, 0.7);
+  position: static;
+  border-radius: 10px;
+  border: 3px solid black;
+  margin-top: 35px;
+  margin-left: 100px;
+  width: 700px;
+  height: 420px;
+}
+
+div.TicketDescription p{
+  padding-left: 15px;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  max-width: 670px;
+}
+
+.Tickets{
+  display: flex;
+  flex-direction: row;
 }
 
 .AddButton{
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  border: 2px solid white;
-  margin-right: 30px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
   padding: 10px 24px;
+  border: 2px solid #124191;
   font-size: 14px;
+  font-weight: bold;
+  color: #124191;
   transition-duration: 0.3s;
+  cursor: pointer;
 }
 
 button:hover.AddButton{
-  background-color:#004a83;
+  background-color: #124191;
+  color: white;
+}
+
+.DownloadButton{
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  margin-right: 30px;
+  border: 2px solid #124191;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #124191;
+  transition-duration: 0.3s;
+  cursor: pointer;
+}
+
+button:hover.DownloadButton{
+  background-color: #124191;
   color: white;
 }
 
 .Charts{
   display: flex;
   flex-direction: row;
+}
+
+a{
+  color: inherit;
+  text-decoration: inherit;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
