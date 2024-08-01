@@ -269,14 +269,23 @@ const Dashboard = () => {
         <div className='TicketDescription'>
           {selectedRow ? (
             <div>
-              <p><b>Incident: </b>{selectedRow.Incident}</p>
-              <p><b>Requestor: </b>{notes.Requestor}</p>
-              <p><b>Team: </b>{notes.Team}</p>
-              <p><b>Project Name: </b>{notes.ProjectName}</p>
-              <p><b>Description: </b>{notes.Description}</p>
+              <div className='TicketDescriptionTitles'>
+                <p><b>Incident: </b>{selectedRow.Incident}</p>
+                <p><b>Requestor: </b>{notes.Requestor}</p>
+                <p><b>Team: </b>{notes.Team}</p>
+                <p><b>Project Name: </b>{notes.ProjectName}</p>
+              </div>
+              <div className='TicketDescriptionContent'>
+                <p><b>Description: </b>{notes.Description}</p>
+                {selectedRow && selectedRow.Status !== "Closed" && (
+                  <button className='CloseTicket' onClick={() => {
+                    axios.put(`http://localhost/Tickets2/tickets/src/backend/closeTicket.php`, { Incident: selectedRow.Incident, Status: "Closed" }).then(fetchTickets);
+                  }}>Close Ticket</button>
+                )}
+              </div>
             </div>
           ) : (
-            <p>Select a ticket to see the details</p>
+            <h3>Select a ticket to see the details</h3>
           )}  
         </div>
       </div>

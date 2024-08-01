@@ -59,8 +59,6 @@ p.TableTitle{
   position: static;
   border-radius: 10px;
   border: 3px solid black;
-  margin-top: 35px;
-  margin-left: 25px;
   width: 940px;
 }
 
@@ -70,9 +68,8 @@ p.TableTitle{
   border-radius: 10px;
   border: 3px solid black;
   margin-top: 35px;
-  margin-left: 100px;
-  width: 700px;
-  height: 420px;
+  width: 940px;
+  height: 350px;
 }
 
 div.TicketDescription p{
@@ -83,9 +80,53 @@ div.TicketDescription p{
   max-width: 670px;
 }
 
+div.TicketDescription h3{
+  text-align: center;
+  vertical-align: middle;
+  line-height: 300px;
+  font-style: italic;
+  color: gray;
+}
+
+.TicketDescriptionTitles{
+  width: 300px;
+  height: 350px;
+  float: left;
+  border-right: 3px solid black;
+}
+
+.TicketDescriptionContent{
+  width: 635px;
+  height: 350px;
+  float: right;
+  position: relative;
+}
+
+.CloseTicket{
+  padding: 10px 24px;
+  border: 2px solid black;
+  border-radius: 5px;
+  background-color: #CF352E;
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  transition-duration: 0.3s;
+}
+
+button:hover.CloseTicket{
+  background-color: darkred;
+}
+
 .Tickets{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  float: left;
+  margin-top: 35px;
+  margin-left: 100px;
 }
 
 .AddButton{
@@ -125,7 +166,17 @@ button:hover.DownloadButton{
 
 .Charts{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  float: right;
+  margin-top: 35px;
+  margin-right: 100px;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.6);
+  position: static;
+  border-radius: 10px;
+  border: 3px solid black;
+  width: 550px;
+  height: 817px;
 }
 
 a{
