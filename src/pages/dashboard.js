@@ -255,6 +255,9 @@ const Dashboard = () => {
                 }}
                 pageSizeOptions={[5, 10]}
                 onRowClick={handleRowClick}
+                localeText={{
+                  noRowsLabel: "Loading data..." 
+                }}
                 sx={{
                   '& .MuiDataGrid-cell': {
                   borderRight: '1px solid black',
@@ -277,11 +280,16 @@ const Dashboard = () => {
               </div>
               <div className='TicketDescriptionContent'>
                 <p><b>Description: </b>{notes.Description}</p>
-                {selectedRow && selectedRow.Status !== "Closed" && (
+                {selectedRow && selectedRow.Status === "In Progress" ? (
                   <button className='CloseTicket' onClick={() => {
-                    axios.put(`http://localhost/Tickets2/tickets/src/backend/closeTicket.php`, { Incident: selectedRow.Incident, Status: "Closed" }).then(fetchTickets);
+                    axios.put(`http://localhost/Tickets2/tickets/src/backend/changeTicketStatus.php`, { Incident: selectedRow.Incident, Status: "Closed" }).then(fetchTickets);
                   }}>Close Ticket</button>
-                )}
+                ) : selectedRow && selectedRow.Status === "Open" ? (
+                  <button className='StartTicket' onClick={() => {
+                    axios.put(`http://localhost/Tickets2/tickets/src/backend/changeTicketStatus.php`, { Incident: selectedRow.Incident, Status: "In Progress" }).then(fetchTickets);
+                  }}>Start Ticket</button>
+                ) : (<p></p>)
+                }
               </div>
             </div>
           ) : (
@@ -311,7 +319,7 @@ const Dashboard = () => {
             </FormControl>
             <FormControl required sx={{marginTop: '15px', marginBottom: '10px'}}>
               <InputLabel id="statusLabel">Status</InputLabel>
-              <Select labelId="statusLabel" id="status" value={isEditMode ? editData.Status : formData.Status} label="Status" name="Status" onChange={isEditMode ? handleEditChange : handleChange} style={{width: 260}}>
+              <Select labelId="statusLabel" id="status" value={isEditMode ? editData.Status : "Open"} label="Status" name="Status" onChange={isEditMode ? handleEditChange : handleChange} style={{width: 260}} disabled={!isEditMode}>
                 <MenuItem value={"Open"}>Open</MenuItem>
                 <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Closed"}>Closed</MenuItem>

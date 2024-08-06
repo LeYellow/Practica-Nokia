@@ -4,7 +4,7 @@
 }
 
 .Body{
-  background-color: rgb(36, 36, 36);
+  background-color: #021526;
   min-width: 100%;
   min-height: 100%;
   position: absolute;
@@ -119,6 +119,25 @@ div.TicketDescription h3{
 
 button:hover.CloseTicket{
   background-color: darkred;
+}
+
+.StartTicket{
+  padding: 10px 24px;
+  border: 2px solid black;
+  border-radius: 5px;
+  background-color: #006A4E;
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  transition-duration: 0.3s;
+}
+
+button:hover.StartTicket{
+  background-color: #1B4D3E;
 }
 
 .Tickets{

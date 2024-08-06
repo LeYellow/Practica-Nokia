@@ -133,6 +133,9 @@ const StatusChart = () => {
                       },
                     }}
                     pageSizeOptions={[]}
+                    localeText={{
+                      noRowsLabel: "Loading data..." 
+                    }}
                   />
                 </div>
               ) : (

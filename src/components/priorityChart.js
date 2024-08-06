@@ -132,6 +132,9 @@ const PriorityChart = () => {
                         paginationModel: { page: 0, pageSize: 5 },
                       },
                     }}
+                    localeText={{
+                      noRowsLabel: "Loading data..." 
+                    }}
                     pageSizeOptions={[]}
                   />
                 </div>
